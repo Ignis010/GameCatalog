@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -5,7 +6,7 @@ from django.db import models
 
 
 class Genres(models.Model):
-    genre_name = models.CharField(verbose_name="Genre name", max_length=100)
+    genre_name = models.CharField(verbose_name="Наименование", max_length=100)
 
     def __str__(self):
         return self.genre_name
@@ -16,13 +17,13 @@ class Genres(models.Model):
 
 
 class Publishers(models.Model):
-    publishers_name = models.CharField(verbose_name="Publishers name", max_length=100)
-    date_registration = models.DateTimeField(verbose_name="Date registration", auto_now_add=True)
-    number = models.IntegerField(verbose_name="Number")
-    site = models.CharField(verbose_name="Site", max_length=250)
+    publishers_name = models.CharField(verbose_name="Наименование", max_length=100)
+    date_registration = models.DateField(verbose_name="Дата регистрации", auto_now_add=True)
+    number = models.IntegerField(verbose_name="Номер телефона", blank=True)
+    site = models.URLField(verbose_name="Официальный сайт", max_length=250)
 
     def __str__(self):
-        return f'{self.publishers_name},{self.date_registration}'
+        return self.publishers_name
 
     class Meta:
         verbose_name = 'Издатель'
@@ -30,22 +31,22 @@ class Publishers(models.Model):
 
 
 class Author(models.Model):
-    surname = models.CharField(verbose_name="Surname", max_length=200)
-    name = models.CharField(verbose_name="Name", max_length=150)
-    patronymic = models.CharField(verbose_name="Patronymic", max_length=200)
-    author_describe = models.TextField(verbose_name="Author describe", blank=True)
-    birthday = models.DateTimeField(verbose_name="Birthday")
+    surname = models.CharField(verbose_name="Фамилия", max_length=200)
+    name = models.CharField(verbose_name="Имя", max_length=150)
+    patronymic = models.CharField(verbose_name="Отчество", max_length=200, blank=True)
+    author_describe = models.TextField(verbose_name="Описание автора", blank=True)
+    birthday = models.IntegerField(verbose_name="Год рождения", )
 
     def __str__(self):
-        return f'{self.surname}, {self.name}'
+        return f'{self.surname} {self.name}'
 
     class Meta:
-        verbose_name = 'Жанр'
-        verbose_name_plural = 'Жанры'
+        verbose_name = 'Автор'
+        verbose_name_plural = 'Авторы'
 
 
 class Country(models.Model):
-    country_name = models.CharField(verbose_name="Country name", max_length=200)
+    country_name = models.CharField(verbose_name="Название", max_length=200)
 
     def __str__(self):
         return self.country_name
@@ -56,18 +57,19 @@ class Country(models.Model):
 
 
 class Games(models.Model):
-    game_name = models.CharField(verbose_name="Game name", max_length=100)
-    genre = models.ForeignKey(Genres, verbose_name="Genre", on_delete=models.PROTECT)
-    publisher = models.ForeignKey(Publishers, verbose_name="Publisher", on_delete=models.PROTECT)
-    photo = models.ImageField(verbose_name="Photo", upload_to='gameimg/%Y/%m/%d')
-    game_describe = models.TextField(verbose_name="Game describe", blank=True)
-    date_publication = models.DateTimeField(verbose_name="Date publication", auto_now_add=True)
-    author = models.ForeignKey(Author, verbose_name="Author", on_delete=models.CASCADE)
-    country = models.ForeignKey(Country, verbose_name="Country", on_delete=models.CASCADE)
-    environment = models.CharField(verbose_name="Environment", max_length=100)
+    game_name = models.CharField(verbose_name="Название", max_length=100)
+    genre = models.ForeignKey(Genres, verbose_name="Жанр", on_delete=models.PROTECT)
+    publisher = models.ForeignKey(Publishers, verbose_name="Издатель", on_delete=models.PROTECT)
+    photo = models.ImageField(verbose_name="Изображение", upload_to='gameimg/%Y/%m/%d')
+    game_describe = models.TextField(verbose_name="Описание игры", blank=True)
+    date_publication = models.DateTimeField(verbose_name="Дата публикации на сайте", auto_now_add=True)
+    author = models.ForeignKey(Author, verbose_name="Автор", on_delete=models.CASCADE)
+    country = models.ForeignKey(Country, verbose_name="Страна производитель", on_delete=models.CASCADE)
+    environment = models.CharField(verbose_name="Сеттинг", max_length=100)
+    editor = models.ForeignKey(User, verbose_name='Редактор', on_delete=models.CASCADE, blank=True, null=True)
 
     def __str__(self):
-        return f'{self.game_name}, {self.publisher},{self.author},{self.date_publication}'
+        return self.game_name
 
     class Meta:
         verbose_name = 'Игра'
